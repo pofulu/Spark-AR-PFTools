@@ -2,7 +2,7 @@
 PFScreen is a tool to set position of scene object with percentage of screen coord. You can use this tool to set the position of an object to ensure that all objects can be placed in the correct position on different devices.
 
 ## How to use
-Just copy/paste full PFTween function to your script in Spark AR. There is only one script accepted in Spark AR.
+Just copy/paste full PFScreen function to your script in Spark AR. There is only one script accepted in Spark AR.
 
 ## Example
 
