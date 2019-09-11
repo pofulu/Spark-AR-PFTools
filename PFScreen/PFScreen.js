@@ -10,7 +10,8 @@ function PFScreen(baseWidth, baseHeight) {
         }, (v, snapshot) => {
             _adaptor = new Adaptor(baseWidth, baseHeight, snapshot.width, snapshot.height);
             this.adaptor = _adaptor;
-            _callback(_adaptor);
+            if(_callback != undefined)
+                _callback(_adaptor);
         });
 
     this.subscribe = (callback) => _callback = callback;
