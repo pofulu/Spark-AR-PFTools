@@ -76,7 +76,7 @@ const ani = new PFTween(plane0.tranform.x, 10, 1000)
 TouchGestures.onTap().subscribe(() => ani.replay());   
 ```
 
-You can add your ease type in the script. For example, there is a 'punch' ease mode:
+You can add your ease type in the script. For example, there is a `punch` ease mode:
 ```javascript
 const Scene = require('Scene'); 
 const plane0 = Scene.root.find('plane0');
