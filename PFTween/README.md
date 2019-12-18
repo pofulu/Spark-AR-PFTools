@@ -48,7 +48,7 @@ const Diagnostics = require('Diagnostics');
 
 const plane0 = Scene.root.find('plane0');
 
-plane0.transform.x = new PFTween(plane0.tranform.x, 10, 1000)
+plane0.transform.x = new PFTween(plane0.tranform.x, 0.1, 1000)
     .setLoop(2)
     .setMirror()
     .setEase(ease.easeInOutExpo)
@@ -65,9 +65,9 @@ const Scene = require('Scene');
 const TouchGestures = require('TouchGestures');
 
 const plane0 = Scene.root.find('plane0');
-plane0.hidden = true;
 
-const ani = new PFTween(plane0.tranform.x, 10, 1000)
+const ani = new PFTween(-0.1, 0.1, 1000)
+    .setEase(ease.easeOutQuard)
     .onUpdate(value => Scene.root.find('plane0').transform.x = value)
     .onStartVisible(plane0)
     .onCompleteHidden(plane0)
@@ -96,3 +96,21 @@ plane0.transform.rotationX = new PFTween(0, 360, 1000)
     .setEase(ease.easeOutCubic)
     .rotation;
 ```
+
+and some useful callbacks: 
+
+`onStartVisible()`
+
+`onStartHidden()`
+
+`onCompleteVisible()`
+
+`onCompleteHidden()`
+
+`onCompleteResetScale()`
+
+`onCompleteResetPosition()`
+
+`onCompleteResetRotation()`
+
+`onCompleteResetOpacity()`
