@@ -1,8 +1,15 @@
 # PFTween
-PFTween is a wrapped Spark AR animation function. You can handle animation just like [DOTween](http://dotween.demigiant.com) in Unity.
+PFTween is a wrapped Spark AR animation function. You can handle animation in Spark AR just like [DOTween](http://dotween.demigiant.com) in Unity.
 
 ## How to use
-Just copy/paste full PFTween function to your script in Spark AR. There is only one script accepted in Spark AR.
+1. Drap/Import to Assets caetgory in Spark AR. (Spark AR support multi scipt file after [v75](https://sparkar.facebook.com/ar-studio/learn/documentation/changelog#75))
+
+2. import `ease` and `PFTween` module at the top of your main script.
+```javascript
+import { ease, PFTween } from './PFTween';
+
+// Your script...
+```
 
 ## Example
 Let's say you want to scale a plane:
@@ -11,12 +18,13 @@ const Scene = require('Scene');
 
 const plane0 = Scene.root.find('plane0');
 
-plane0.transform.scale = new PFTween(0, 1, 1000).ToScale();
+plane0.transform.scale = new PFTween(0, 1, 1000).scale;
 ```
 
 You can also change ease type:
 ```javascript
-plane0.transform.scale = new PFTween(0, 1, 1000).SetEase('easeOutBack').ToScale();
+plane0.transform.scale = new PFTween(0, 1, 1000).setEase(ease.easeOutBack)
+  .scale;
 ```
 
 or make it loop:
