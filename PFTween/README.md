@@ -5,7 +5,7 @@ PFTween is a wrapped Spark AR animation function. You can handle animation in Sp
 
 0. [Download PFTween](https://github.com/pofulu/Spark-AR-PFTools/raw/master/PFTween/PFTween.js) (Right click and Save as)
 
-1. Drap/Import to Assets caetgory in Spark AR. (Spark AR support multi scipt file after [v75](https://sparkar.facebook.com/ar-studio/learn/documentation/changelog#75))
+1. Drap/Import to Assets caetgory in Spark AR. (Spark AR support multiple script files after [v75](https://sparkar.facebook.com/ar-studio/learn/documentation/changelog#75))
 
 2. import `ease` and `PFTween` module at the top of your main script.
 ```javascript
