@@ -22,10 +22,10 @@ import { PFSound } from './PFSound';
 
 const TouchGestures = require('TouchGestures');
 
-const bgm = new PFSound('bgm', true, true, 1);
-const sfx = new PFSound('sfx');
-
 let isPlayBGM = true;
+
+const bgm = new PFSound('bgm', isPlayBGM, true, 1);
+const sfx = new PFSound('sfx');
 
 TouchGestures.onTap().subscribe(() => sfx.play());
 TouchGestures.onLongPress().subscribe(toggleFadeBGM);
