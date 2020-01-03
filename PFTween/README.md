@@ -56,7 +56,7 @@ plane0.transform.x = new PFTween(plane0.tranform.x, 0.1, 1000)
     .setMirror()
     .setEase(Ease.easeInOutExpo)
     .setDelay(1500)
-		.onLooped(index => Diagnostics.log(`loop: ${index}`))
+    .onLooped(index => Diagnostics.log(`loop: ${index}`))
     .onStartVisible(plane0)    // this plane will be visible when animation start
     .onCompleteHidden(plane0)  // and will be hidden on completed
     .onComplete(() => Diagnostics.log('completed!'))
