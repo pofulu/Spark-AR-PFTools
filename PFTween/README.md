@@ -148,8 +148,8 @@ new PFTween(0, 0.1, 1000).setEase(Ease.easeInOutCirc)
 			.setEase(Ease.easeOutQuart)
 			.bind(tweener => plane.transform.rotationZ = tweener.rotation)
 			.promise,
-
-    	new PFTween(plane.transform.scaleX, 2.5, 1000)
+		
+		new PFTween(plane.transform.scaleX, 2.5, 1000)
 			.setEase(Ease.easeOutBack)
 			.bind(tweener => plane.transform.scale = tweener.scale)
 			.promise]))
