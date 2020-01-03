@@ -4,17 +4,20 @@ PFTween is a wrapped Spark AR animation function. You can handle animation in Sp
 ## How to use
 
 0. [Download PFTween](https://github.com/pofulu/Spark-AR-PFTools/raw/master/PFTween/PFTween.js) (Right click and Save as)
-
 1. Drap/Import to Assets caetgory in Spark AR. (Spark AR support multiple script files after [v75](https://sparkar.facebook.com/ar-studio/learn/documentation/changelog#75))
-
-2. import `ease` and `PFTween` module at the top of your main script.
+2. Import `Ease` and `PFTween` module at the top of your main script.
 ```javascript
-import { ease, PFTween } from './PFTween';
+import { Ease, PFTween } from './PFTween';
 
 // Your script...
 ```
 
-## Example
+3. You can also click here to download a sample project.
+
+   
+
+## Getting Start
+
 Let's say you want to scale a plane:
 ```javascript
 const Scene = require('Scene'); 
@@ -27,14 +30,14 @@ plane0.transform.scale = new PFTween(0, 1, 1000).scale;
 You can also change ease type:
 ```javascript
 plane0.transform.scale = new PFTween(0, 1, 1000)
-    .setEase(ease.easeOutBack)
+    .setEase(Ease.easeOutBack)
     .scale;
 ```
 
 or make it loop:
 ```javascript
 plane0.transform.scale = new PFTween(0, 1, 1000)
-    .setEase(ease.easeOutBack)
+    .setEase(Ease.easeOutBack)
     .setLoop()
     .setMirror()
     .scale;
@@ -51,29 +54,13 @@ const plane0 = Scene.root.find('plane0');
 plane0.transform.x = new PFTween(plane0.tranform.x, 0.1, 1000)
     .setLoop(2)
     .setMirror()
-    .setEase(ease.easeInOutExpo)
+    .setEase(Ease.easeInOutExpo)
     .setDelay(1500)
+		.onLooped(index => Diagnostics.log(`loop: ${index}`))
     .onStartVisible(plane0)    // this plane will be visible when animation start
     .onCompleteHidden(plane0)  // and will be hidden on completed
     .onComplete(() => Diagnostics.log('completed!'))
     .scalar;                   // the value type 'poisition.x' is 'scalar'
-```
-
-Reuse the animation:
-```javascript
-const Scene = require('Scene'); 
-const TouchGestures = require('TouchGestures');
-
-const plane0 = Scene.root.find('plane0');
-
-const ani = new PFTween(-0.1, 0.1, 1000)
-    .setEase(ease.easeOutQuard)
-    .onUpdate(value => Scene.root.find('plane0').transform.x = value)
-    .onStartVisible(plane0)
-    .onCompleteHidden(plane0)
-    .apply(false); 
-    
-TouchGestures.onTap().subscribe(() => ani.replay());   
 ```
 
 You can add your ease type in the script. For example, there is a `punch` ease mode:
@@ -114,3 +101,59 @@ and some useful callbacks:
 `onCompleteResetRotation()`
 
 `onCompleteResetOpacity()`
+
+
+
+## Reuse the Animation
+
+If you want to reuse the animation. For this purpose, you need use `bind` to set the value and call `apply` in the end of PFTween chain.
+
+```javascript
+const Scene = require('Scene'); 
+const TouchGestures = require('TouchGestures');
+
+const plane0 = Scene.root.find('plane0');
+
+const ani = new PFTween(-0.1, 0.1, 1000)
+    .setEase(Ease.easeOutQuard)
+    .bind(value => Scene.root.find('plane0').transform.x = value) // Bind the tween value
+    .onStartVisible(plane0)
+    .onCompleteHidden(plane0)
+    .apply(false); 	// Don't auto start animation when we call the apply()
+    
+TouchGestures.onTap().subscribe(() => ani.replay());   
+```
+
+
+
+## Async and Promise
+
+You can use Promise to make the animation sequence. You need to use `bind` to set value as well. At the end of PFTween chian, you need to get the `promise` instead of call `apply`. 
+
+When you get the `promise`, it returns a Promise, and the animation will start play immediately. 
+
+```js
+const Scene = require('Scene'); 
+const Diagnostics = require('Diagnostics');
+
+const plane = Scene.root.find('plane0');
+
+new PFTween(0, 0.1, 1000)
+  .setEase(Ease.easeInOutCirc)
+  .setMirror()
+  .setLoop(2)
+  .bind(tweener => plane.transform.x = tweener.scalar)
+  .promise
+ 	.then(() => Promise.all([
+  	new PFTween(plane.transform.rotationZ, 270, 1000)
+			.setEase(Ease.easeOutQuart)
+      .bind(tweener => plane.transform.rotationZ = tweener.rotation)
+      .promise,
+
+    new PFTween(plane.transform.scaleX, 2.5, 1000)
+      .setEase(Ease.easeOutBack)
+      .bind(tweener => plane.transform.scale = tweener.scale)
+      .promise]))
+	.then(() => Diagnostics.log('Finished'));
+```
+

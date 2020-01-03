@@ -3,41 +3,6 @@ const Reactive = require('Reactive');
 const Time = require('Time');
 const Diagnostics = require('Diagnostics');
 
-const ease = {
-    linear: 'linear',
-    easeInQuad: 'easeInQuad',
-    easeOutQuad: 'easeOutQuad',
-    easeInOutQuad: 'easeInOutQuad',
-    easeInCubic: 'easeInCubic',
-    easeOutCubic: 'easeOutCubic',
-    easeInOutCubic: 'easeInOutCubic',
-    easeInQuart: 'easeInQuart',
-    easeOutQuart: 'easeOutQuart',
-    easeInOutQuart: 'easeInOutQuart',
-    easeInQuint: 'easeInQuint',
-    easeOutQuint: 'easeOutQuint',
-    easeInOutQuint: 'easeInOutQuint',
-    easeInSine: 'easeInSine',
-    easeOutSine: 'easeOutSine',
-    easeInOutSine: 'easeInOutSine',
-    easeInExpo: 'easeInExpo',
-    easeOutExpo: 'easeOutExpo',
-    easeInOutExpo: 'easeInOutExpo',
-    easeInCirc: 'easeInCirc',
-    easeOutCirc: 'easeOutCirc',
-    easeInOutCirc: 'easeInOutCirc',
-    easeInBack: 'easeInBack',
-    easeOutBack: 'easeOutBack',
-    easeInOutBack: 'easeInOutBack',
-    easeInElastic: 'easeInElastic',
-    easeOutElastic: 'easeOutElastic',
-    easeInOutElastic: 'easeInOutElastic',
-    easeInBounce: 'easeInBounce',
-    easeOutBounce: 'easeOutBounce',
-    easeInOutBounce: 'easeInOutBounce',
-    punch: 'punch'
-};
-
 const samplers = {
     linear: (from, to) => Animation.samplers.linear(from, to),
     easeInQuad: (from, to) => Animation.samplers.easeInQuad(from, to),
@@ -77,192 +42,222 @@ const samplers = {
             from + (amount / 5) * 2,
             from - (amount / 5) * 1,
             from
-        ]
-        , knots: [
-            0, 1, 2, 3, 4
-        ]
-    })
+        ],
+        knots: [0, 1, 2, 3, 4]
+    }),
 };
 
-let privates = new WeakMap();
+const degreeToRadian = Math.PI / 180;
+let privates = instantiatePrivateMap();
 
 class PFTween {
     constructor(from, to, durationMilliseconds) {
-        const _from = typeof from.pinLastValue === 'function' ? from.pinLastValue() : from;
-        const _to = typeof to.pinLastValue === 'function' ? to.pinLastValue() : to;
+        privates(this).from = typeof from.pinLastValue === 'function' ? from.pinLastValue() : from;
+        privates(this).to = typeof to.pinLastValue === 'function' ? to.pinLastValue() : to;
+        privates(this).duration = durationMilliseconds;
+        privates(this).start = [];
+        privates(this).complete = [];
+        privates(this).update = [];
+        privates(this).loop = [];
 
-        privates.set(this, {
-            from: _from,
-            to: _to,
-            duration: durationMilliseconds,
-            sampler: Animation.samplers.linear(_from, _to),
-            start: [],
-            complete: [],
-            update: []
-        });
-
-        return this;
+        this.setEase(samplers.linear);
     }
 
     setMirror(isMirror = true) {
-        let data = privates.get(this);
-        data.isMirror = isMirror;
-        privates.set(this, data);
+        privates(this).isMirror = isMirror;
         return this;
     }
 
     setLoop(loopCount = Infinity) {
-        let data = privates.get(this);
-        data.loopCount = loopCount;
-        privates.set(this, data);
+        privates(this).loopCount = loopCount;
         return this;
     }
 
+    /**
+     * @param {{(from: number,to: number):ScalarSampler}} ease 
+     */
     setEase(ease) {
-        let data = privates.get(this);
-        data.sampler = samplers[ease](data.from, data.to);
-        privates.set(this, data);
+        privates(this).sampler = ease(
+            privates(this).from,
+            privates(this).to
+        );
         return this;
     }
 
+    /**
+     * @param {number} delayMilliseconds 
+     */
     setDelay(delayMilliseconds) {
-        let data = privates.get(this);
-        data.delay = delayMilliseconds;
-        privates.set(this, data);
+        privates(this).delay = delayMilliseconds;
         return this;
     }
 
-    onUpdate(call) {
-        let data = privates.get(this);
-        data.update.push(call);
-        privates.set(this, data);
+    /**
+     * @param {{(tweener: PFTweener) : void}} call 
+     */
+    bind(call) {
+        privates(this).update.push(call);
         return this;
     }
 
+    /**
+     * @param {{(iteration: number) : void}} call
+     */
+    onLooped(call) {
+        privates(this).loop.push(call);
+        return this;
+    }
+
+    /**
+     * @param {{() : void}} call
+     */
     onStart(call) {
-        let data = privates.get(this);
-        data.start.push(call);
-        privates.set(this, data);
+        privates(this).start.push(call);
         return this;
     }
 
+    /**
+     * @param {{() : void}} call
+     */
     onCompleted(call) {
-        let data = privates.get(this);
-        data.complete.push(call);
-        privates.set(this, data);
+        privates(this).complete.push(call);
         return this;
     }
 
+    /**
+     * @param {SceneObjectBase} sceneObject
+     */
     onStartVisible(sceneObject) {
-        let data = privates.get(this);
-        data.start.push(() => sceneObject.hidden = false);
-        privates.set(this, data);
+        privates(this).start.push(() => sceneObject.hidden = Reactive.val(false));
         return this;
     }
 
+    /**
+     * @param {SceneObjectBase} sceneObject
+     */
     onStartHidden(sceneObject) {
-        let data = privates.get(this);
-        data.start.push(() => sceneObject.hidden = true);
-        privates.set(this, data);
+        privates(this).start.push(() => sceneObject.hidden = Reactive.val(true));
         return this;
     }
 
+    /**
+     * @param {SceneObjectBase} sceneObject
+     */
     onCompleteVisible(sceneObject) {
-        let data = privates.get(this);
-        data.complete.push(() => sceneObject.hidden = false);
-        privates.set(this, data);
+        privates(this).complete.push(() => sceneObject.hidden = Reactive.val(false));
         return this;
     }
 
+    /**
+     * @param {SceneObjectBase} sceneObject
+     */
     onCompleteHidden(sceneObject) {
-        let data = privates.get(this);
-        data.complete.push(() => sceneObject.hidden = true);
-        privates.set(this, data);
+        privates(this).complete.push(() => sceneObject.hidden = Reactive.val(true));
         return this;
     }
 
+    /**
+     * @param {SceneObjectBase} sceneObject 
+     */
     onCompleteResetPosition(sceneObject) {
-        let data = privates.get(this);
+        const originPositionX = sceneObject.transform.x.pinLastValue();
+        const originPositionY = sceneObject.transform.y.pinLastValue();
+        const originPositionZ = sceneObject.transform.z.pinLastValue();
+        privates(this).complete.push(() => {
+            sceneObject.transform.x = originPositionX;
+            sceneObject.transform.y = originPositionY;
+            sceneObject.transform.z = originPositionZ;
+        });
+        return this;
+    }
+
+    /**
+     * @param {SceneObjectBase} sceneObject
+     */
+    onCompleteResetRotation(sceneObject) {
         const originRotationX = sceneObject.transform.rotationX.pinLastValue();
-        const originRotationY = sceneObject.transform.rotationX.pinLastValue();
-        const originRotationZ = sceneObject.transform.rotationX.pinLastValue();
-        data.complete.push(() => {
+        const originRotationY = sceneObject.transform.rotationY.pinLastValue();
+        const originRotationZ = sceneObject.transform.rotationZ.pinLastValue();
+        privates(this).complete.push(() => {
             sceneObject.transform.rotationX = originRotationX;
             sceneObject.transform.rotationY = originRotationY;
             sceneObject.transform.rotationZ = originRotationZ;
         });
-        privates.set(this, data);
         return this;
     }
 
-    onCompleteResetRotation(sceneObject) {
-        let data = privates.get(this);
-        const originOpacity = sceneObject.material.opacity.pinLastValue();
-        data.complete.push(() => {
-            sceneObject.material.opacity = originOpacity;
+    /**
+     * @param {SceneObjectBase} sceneObject
+     */
+    onCompleteResetScale(sceneObject) {
+        const originScaleX = sceneObject.transform.scaleX.pinLastValue();
+        const originScaleY = sceneObject.transform.scaleY.pinLastValue();
+        const originScaleZ = sceneObject.transform.scaleZ.pinLastValue();
+        privates(this).complete.push(() => {
+            sceneObject.transform.scale = Reactive.scale(originScaleX, originScaleY, originScaleZ);
         });
-        privates.set(this, data);
         return this;
     }
 
     onCompleteResetOpacity(sceneObject) {
-        let data = privates.get(this);
         const originOpacity = sceneObject.material.opacity.pinLastValue();
-        data.complete.push(() => {
+        privates(this).complete.push(() => {
             sceneObject.material.opacity = originOpacity;
         });
-        privates.set(this, data);
-        return this;
-    }
-
-    onCompleteResetScale(sceneObject) {
-        let data = privates.get(this);
-        const originScaleX = sceneObject.transform.scaleX.pinLastValue();
-        const originScaleY = sceneObject.transform.scaleX.pinLastValue();
-        const originScaleZ = sceneObject.transform.scaleX.pinLastValue();
-        data.complete.push(() => {
-            sceneObject.transform.scale = Reactive.scale(originScaleX, originScaleY, originScaleZ);
-        });
-        privates.set(this, data);
         return this;
     }
 
     apply(autoPlay = true) {
-        return animate(privates.get(this), autoPlay);
+        return animate(privates(this), autoPlay);
+    }
+
+    /**@returns {Promise<void>} - get `promise` will start animation immediately*/
+    get promise() {
+        const promise = new Promise((resolve, reject) => {
+            privates(this).complete.push(() => resolve());
+
+            if (privates(this).loopCount == Infinity) {
+                reject('Set infinite loop will stuck the promise in PFTween.');
+            }
+            
+            animate(privates(this), true);
+        })
+
+        return promise;
     }
 
     get log() {
-        return privates.get(this);
+        return privates(this)
     }
 
     get scalar() {
-        return animate(privates.get(this), true).scalar;
+        return animate(privates(this), true).scalar;
     }
 
     get scale() {
-        return animate(privates.get(this), true).scale;
+        return animate(privates(this), true).scale;
     }
 
     get pack3() {
-        return animate(privates.get(this), true).pack3;
+        return animate(privates(this), true).pack3;
     }
 
     get pack4() {
-        return animate(privates.get(this), true).pack4;
+        return animate(privates(this), true).pack4;
     }
 
     get rotation() {
-        return animate(privates.get(this), true).rotation;
+        return animate(privates(this), true).rotation;
     }
 }
 
-class Tweener {
+class PFTweener {
     constructor(driver, animate, delay, start, update) {
-        this.delay = delay;
-        this.animate = animate;
-        this.driver = driver;
-        this.onStart = start;
-        this.onUpdate = update;
+        privates(this).delay = delay;
+        privates(this).animate = animate;
+        privates(this).driver = driver;
+        privates(this).onStart = start;
+        privates(this).onUpdate = update;
     }
 
     replay() {
@@ -271,61 +266,63 @@ class Tweener {
     }
 
     reset() {
-        this.driver.reset();
+        privates(this).driver.reset();
     }
 
     reverse() {
-        this.driver.reverse();
+        privates(this).driver.reverse();
     }
 
     start() {
         const play = () => {
-            if (this.onStart.length != 0)
-                invoke(this.onStart);
-
-            if (this.onUpdate.length != 0)
-                invoke(this.onUpdate, this.animate);
-
-            this.driver.start();
+            invoke(privates(this).onStart);
+            invoke(privates(this).onUpdate, this);
+            privates(this).driver.start();
         }
 
-        if (this.delay != undefined) {
-            Time.setTimeout(play, this.delay);
+        if (privates(this).delay != undefined) {
+            Time.setTimeout(play, privates(this).delay);
         } else {
             play();
         }
     }
 
     stop() {
-        this.driver.start();
+        privates(this).driver.stop();
     }
 
+    /**@returns {BoolSignal} */
     get isRuning() {
-        return this.driver.isRuning;
+        return privates(this).driver.isRunning();
     }
 
+    /**@returns {ScalarSignal} */
     get scalar() {
-        return this.animate;
+        return privates(this).animate;
     }
 
+    /**@returns {ScaleSignal} */
     get scale() {
         const scalar = this.scalar;
         return Reactive.scale(scalar, scalar, scalar);
     }
 
+    /**@returns {PointSignal} */
     get pack3() {
         const scalar = this.scalar
         return Reactive.pack3(scalar, scalar, scalar);
     }
 
+    /**@returns {Point4DSignal} */
     get pack4() {
         const scalar = this.scalar
         return Reactive.pack4(scalar, scalar, scalar, scalar);
     }
 
+    /**@returns {ScalarSignal} */
     get rotation() {
         const scalar = this.scalar
-        return scalar.mul(Math.PI / 180);
+        return scalar.mul(degreeToRadian);
     }
 }
 
@@ -336,17 +333,13 @@ function animate(config, autoPlay) {
         mirror: config.isMirror
     });
 
+    driver.onCompleted().subscribe(() => invoke(config.complete));
+    driver.onAfterIteration().subscribe(index => invoke(config.loop, index));
+
     const animate = Animation.animate(driver, config.sampler);
+    const tweener = new PFTweener(driver, animate, config.delay, config.start, config.update);
 
-    if (config.complete.length != 0) {
-        driver.onCompleted().subscribe(() => invoke(config.complete));
-    }
-
-    const tweener = new Tweener(driver, animate, config.delay, config.start, config.update);
-
-    if (autoPlay) {
-        tweener.start();
-    }
+    if (autoPlay) tweener.start();
 
     return tweener;
 }
@@ -357,4 +350,16 @@ function invoke(calls, arg) {
     }
 }
 
-export { PFTween, ease };
+function instantiatePrivateMap() {
+    const map = new WeakMap();
+    return obj => {
+        let props = map.get(obj);
+        if (!props) {
+            props = {};
+            map.set(obj, props);
+        }
+        return props;
+    };
+}
+
+export { PFTween, samplers as Ease };
