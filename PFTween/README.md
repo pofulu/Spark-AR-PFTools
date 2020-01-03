@@ -12,7 +12,7 @@ import { Ease, PFTween } from './PFTween';
 // Your script...
 ```
 
-3. You can also click here to download a sample project.
+3. You can also [Click Here to Download a Sample Project](https://github.com/pofulu/Spark-AR-PFTools/raw/master/PFTween/PFTween%20Sample.zip).
 
    
 
@@ -138,22 +138,21 @@ const Diagnostics = require('Diagnostics');
 
 const plane = Scene.root.find('plane0');
 
-new PFTween(0, 0.1, 1000)
-  .setEase(Ease.easeInOutCirc)
-  .setMirror()
-  .setLoop(2)
-  .bind(tweener => plane.transform.x = tweener.scalar)
-  .promise
- 	.then(() => Promise.all([
-  	new PFTween(plane.transform.rotationZ, 270, 1000)
+new PFTween(0, 0.1, 1000).setEase(Ease.easeInOutCirc)
+	.setMirror()
+  	.setLoop(2)
+  	.bind(tweener => plane.transform.x = tweener.scalar)
+  	.promise
+  	.then(() => Promise.all([
+  		new PFTween(plane.transform.rotationZ, 270, 1000)
 			.setEase(Ease.easeOutQuart)
-      .bind(tweener => plane.transform.rotationZ = tweener.rotation)
-      .promise,
+			.bind(tweener => plane.transform.rotationZ = tweener.rotation)
+			.promise,
 
-    new PFTween(plane.transform.scaleX, 2.5, 1000)
-      .setEase(Ease.easeOutBack)
-      .bind(tweener => plane.transform.scale = tweener.scale)
-      .promise]))
+    	new PFTween(plane.transform.scaleX, 2.5, 1000)
+			.setEase(Ease.easeOutBack)
+			.bind(tweener => plane.transform.scale = tweener.scale)
+			.promise]))
 	.then(() => Diagnostics.log('Finished'));
 ```
 
