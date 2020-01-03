@@ -38,8 +38,8 @@ class PFSound {
 
         _this.toStopPlaying = false;
 
-        _this.controller.reset();
         _this.controller.setPlaying(true);
+        _this.controller.reset();
 
         if (fadeDuration != undefined) {
             _this.speaker.volume = Animate(_this.speaker.volume.pinLastValue(), _this.startVolumn, fadeDuration);
