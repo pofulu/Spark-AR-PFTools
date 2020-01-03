@@ -138,7 +138,9 @@ const Diagnostics = require('Diagnostics');
 
 const plane = Scene.root.find('plane0');
 
-new PFTween(0, 0.1, 1000).setEase(Ease.easeInOutCirc).setMirror()
+new PFTween(0, 0.1, 1000)
+    .setEase(Ease.easeInOutCirc)
+    .setMirror()
     .setLoop(2)
     .bind(tweener => plane.transform.x = tweener.scalar)
     .promise
