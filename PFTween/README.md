@@ -51,11 +51,11 @@ const Diagnostics = require('Diagnostics');
 
 const plane0 = Scene.root.find('plane0');
 
-plane0.transform.x = new PFTween(plane0.tranform.x, 0.1, 1000)
+plane0.transform.x = new PFTween(plane0.transform.x, 0.1, 1000)
     .setLoop(2)
     .setMirror()
     .setEase(Ease.easeInOutExpo)
-    .setDelay(1500)
+    .setDelay(500)
     .onLooped(index => Diagnostics.log(`loop: ${index}`))
     .onStartVisible(plane0)    // this plane will be visible when animation start
     .onCompleteHidden(plane0)  // and will be hidden on completed
@@ -68,8 +68,8 @@ You can add your ease type in the script. For example, there is a `punch` ease m
 const Scene = require('Scene'); 
 const plane0 = Scene.root.find('plane0');
 
-plane0.transform.scale = new PFTween(1, 0.1, 400)
-    .setEase(ease.punch)
+plane0.transform.scale = new PFTween(1, 0.3, 400)
+    .setEase(Ease.punch)
     .scale;
 ```
 
@@ -80,7 +80,7 @@ const plane0 = Scene.root.find('plane0');
 
 plane0.transform.rotationX = new PFTween(0, 360, 1000)
     .setMirror()
-    .setEase(ease.easeOutCubic)
+    .setEase(Ease.easeOutCubic)
     .rotation;
 ```
 
@@ -136,7 +136,7 @@ When you get the `promise`, it returns a Promise, and the animation will start p
 const Scene = require('Scene'); 
 const Diagnostics = require('Diagnostics');
 
-const plane = Scene.root.find('plane0');
+const plane0 = Scene.root.find('plane0');
 
 new PFTween(0, 0.1, 1000)
     .setEase(Ease.easeInOutCirc)
@@ -145,14 +145,14 @@ new PFTween(0, 0.1, 1000)
     .bind(tweener => plane.transform.x = tweener.scalar)
     .promise
     .then(() => Promise.all([
-        new PFTween(plane.transform.rotationZ, 270, 1000)
+        new PFTween(plane0.transform.rotationZ, 270, 1000)
             .setEase(Ease.easeOutQuart)
-            .bind(tweener => plane.transform.rotationZ = tweener.rotation)
+            .bind(tweener => plane0.transform.rotationZ = tweener.rotation)
             .promise,
 		
-        new PFTween(plane.transform.scaleX, 2.5, 1000)
+        new PFTween(plane0.transform.scaleX, 2.5, 1000)
             .setEase(Ease.easeOutBack)
-            .bind(tweener => plane.transform.scale = tweener.scale)
+            .bind(tweener => plane0.transform.scale = tweener.scale)
             .promise]))
     .then(() => Diagnostics.log('Finished'));
 ```
