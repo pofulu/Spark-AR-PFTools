@@ -59,7 +59,7 @@ plane0.transform.x = new PFTween(plane0.transform.x, 0.1, 1000)
     .onLooped(index => Diagnostics.log(`loop: ${index}`))
     .onStartVisible(plane0)    // this plane will be visible when animation start
     .onCompleteHidden(plane0)  // and will be hidden on completed
-    .onComplete(() => Diagnostics.log('completed!'))
+    .onCompleted(() => Diagnostics.log('completed!'))
     .scalar;                   // the value type 'poisition.x' is 'scalar'
 ```
 
