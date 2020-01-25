@@ -52,14 +52,14 @@ const Diagnostics = require('Diagnostics');
 const plane0 = Scene.root.find('plane0');
 
 plane0.transform.x = new PFTween(plane0.transform.x, 0.1, 1000)
-    .setLoop(2)
+    .setLoops(2)
     .setMirror()
     .setEase(Ease.easeInOutExpo)
     .setDelay(500)
-    .onLooped(index => Diagnostics.log(`loop: ${index}`))
+    .onLoop(index => Diagnostics.log(`loop: ${index}`))
     .onStartVisible(plane0)    // this plane will be visible when animation start
     .onCompleteHidden(plane0)  // and will be hidden on completed
-    .onCompleted(() => Diagnostics.log('completed!'))
+    .onComplete(() => Diagnostics.log('completed!'))
     .scalar;                   // the value type 'poisition.x' is 'scalar'
 ```
 
@@ -126,11 +126,11 @@ TouchGestures.onTap().subscribe(() => ani.replay());
 
 
 
-## Async and Promise
+## Clips - Async and Promise
 
-You can use Promise to make the animation sequence. You need to use `bind` to set value as well. At the end of PFTween chian, you need to get the `promise` instead of call `apply`. 
+In order to use Promise to animate a sequence, you must set the value with `bind`. At the end of PFTween chian, you need to get the `clip` instead of call `apply()`. 
 
-When you get the `promise`, it returns a Promise, and the animation will start play immediately. 
+When you get  `clip`, it returns a Promise function. If you want to play the clip, just call `clip()`.
 
 ```js
 const Scene = require('Scene'); 
@@ -138,22 +138,70 @@ const Diagnostics = require('Diagnostics');
 
 const plane0 = Scene.root.find('plane0');
 
-new PFTween(0, 0.1, 1000)
+// Make animation and save as clip
+const ani_position = new PFTween(0, 0.1, 1000)
     .setEase(Ease.easeInOutCirc)
     .setMirror()
     .setLoop(2)
     .bind(tweener => plane.transform.x = tweener.scalar)
-    .promise
-    .then(() => Promise.all([
-        new PFTween(plane0.transform.rotationZ, 270, 1000)
-            .setEase(Ease.easeOutQuart)
-            .bind(tweener => plane0.transform.rotationZ = tweener.rotation)
-            .promise,
-		
-        new PFTween(plane0.transform.scaleX, 2.5, 1000)
-            .setEase(Ease.easeOutBack)
-            .bind(tweener => plane0.transform.scale = tweener.scale)
-            .promise]))
-    .then(() => Diagnostics.log('Finished'));
+    .clip;
+
+const ani_rotation = new PFTween(plane0.transform.rotationZ, 270, 1000)
+		.setEase(Ease.easeOutQuart)
+		.bind(tweener => plane0.transform.rotationZ = tweener.rotation)
+		.clip;
+
+const ani_scale = new PFTween(plane0.transform.scaleX, 2.5, 1000)
+		.setEase(Ease.easeOutBack)
+		.bind(tweener => plane0.transform.scale = tweener.scale)
+		.clip;
+
+// Play these animation in sequence
+ani_position()
+  	.then(ani_rotation)
+		.then(ani_scale)
+		.then(() => Diagnostics.log('Finished'))
 ```
 
+
+
+## Combine Multiple Clips
+
+There is a static funtion for this. You can use `PFTween.combine()` to combine multiple clips in to one Promise animation.
+
+```js
+const Scene = require('Scene'); 
+const Diagnostics = require('Diagnostics');
+
+const plane0 = Scene.root.find('plane0');
+
+// Make animation and save as clip
+const ani_position = new PFTween(0, 0.1, 1000)
+    .setEase(Ease.easeInOutCirc)
+    .setMirror()
+    .setLoop(2)
+    .bind(tweener => plane.transform.x = tweener.scalar)
+    .clip;
+
+const ani_scale = new PFTween(plane0.transform.scaleX, 2.5, 1000)
+		.setMirror()
+    .setLoop(2)
+		.setEase(Ease.easeOutBack)
+		.bind(tweener => plane0.transform.scale = tweener.scale)
+		.clip;
+
+const ani_rotation = new PFTween(plane0.transform.rotationZ, 270, 1000)
+		.setEase(Ease.easeOutQuart)
+		.bind(tweener => plane0.transform.rotationZ = tweener.rotation)
+		.clip;
+
+// Use PFTween.combine() to combine multiple clips
+const ani_combined = PFTween.combine(ani_position, ani_scale);
+
+// Play these animation in sequence
+ani_position()
+		.then(ani_scale)
+  	.then(ani_rotation)
+		.then(ani_combined)
+		.then(() => Diagnostics.log('Finished'))
+```
