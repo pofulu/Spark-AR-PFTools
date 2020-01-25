@@ -116,7 +116,7 @@ const plane0 = Scene.root.find('plane0');
 
 const ani = new PFTween(-0.1, 0.1, 1000)
     .setEase(Ease.easeOutQuard)
-    .bind(value => Scene.root.find('plane0').transform.x = value)
+    .bind(tweener => Scene.root.find('plane0').transform.x = tweener.scalar)
     .onStartVisible(plane0)
     .onCompleteHidden(plane0)
     .apply(false);
