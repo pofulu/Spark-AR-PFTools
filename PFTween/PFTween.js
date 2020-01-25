@@ -4,83 +4,108 @@ const Time = require('Time');
 const Diagnostics = require('Diagnostics');
 
 const samplers = {
-    linear: (from, to) => Animation.samplers.linear(from, to),
-    easeInQuad: (from, to) => Animation.samplers.easeInQuad(from, to),
-    easeOutQuad: (from, to) => Animation.samplers.easeOutQuad(from, to),
-    easeInOutQuad: (from, to) => Animation.samplers.easeInOutQuad(from, to),
-    easeInCubic: (from, to) => Animation.samplers.easeInCubic(from, to),
-    easeOutCubic: (from, to) => Animation.samplers.easeOutCubic(from, to),
-    easeInOutCubic: (from, to) => Animation.samplers.easeInOutCubic(from, to),
-    easeInQuart: (from, to) => Animation.samplers.easeInQuart(from, to),
-    easeOutQuart: (from, to) => Animation.samplers.easeOutQuart(from, to),
-    easeInOutQuart: (from, to) => Animation.samplers.easeInOutQuart(from, to),
-    easeInQuint: (from, to) => Animation.samplers.easeInQuint(from, to),
-    easeOutQuint: (from, to) => Animation.samplers.easeOutQuint(from, to),
-    easeInOutQuint: (from, to) => Animation.samplers.easeInOutQuint(from, to),
-    easeInSine: (from, to) => Animation.samplers.easeInSine(from, to),
-    easeOutSine: (from, to) => Animation.samplers.easeOutSine(from, to),
-    easeInOutSine: (from, to) => Animation.samplers.easeInOutSine(from, to),
-    easeInExpo: (from, to) => Animation.samplers.easeInExpo(from, to),
-    easeOutExpo: (from, to) => Animation.samplers.easeOutExpo(from, to),
-    easeInOutExpo: (from, to) => Animation.samplers.easeInOutExpo(from, to),
-    easeInCirc: (from, to) => Animation.samplers.easeInCirc(from, to),
-    easeOutCirc: (from, to) => Animation.samplers.easeOutCirc(from, to),
-    easeInOutCirc: (from, to) => Animation.samplers.easeInOutCirc(from, to),
-    easeInBack: (from, to) => Animation.samplers.easeInBack(from, to),
-    easeOutBack: (from, to) => Animation.samplers.easeOutBack(from, to),
-    easeInOutBack: (from, to) => Animation.samplers.easeInOutBack(from, to),
-    easeInElastic: (from, to) => Animation.samplers.easeInElastic(from, to),
-    easeOutElastic: (from, to) => Animation.samplers.easeOutElastic(from, to),
-    easeInOutElastic: (from, to) => Animation.samplers.easeInOutElastic(from, to),
-    easeInBounce: (from, to) => Animation.samplers.easeInBounce(from, to),
-    easeOutBounce: (from, to) => Animation.samplers.easeOutBounce(from, to),
-    easeInOutBounce: (from, to) => Animation.samplers.easeInOutBounce(from, to),
-    punch: (from, amount) => Animation.samplers.polyline({
+    linear: (begin, end) => Animation.samplers.linear(begin, end),
+    easeInQuad: (begin, end) => Animation.samplers.easeInQuad(begin, end),
+    easeOutQuad: (begin, end) => Animation.samplers.easeOutQuad(begin, end),
+    easeInOutQuad: (begin, end) => Animation.samplers.easeInOutQuad(begin, end),
+    easeInCubic: (begin, end) => Animation.samplers.easeInCubic(begin, end),
+    easeOutCubic: (begin, end) => Animation.samplers.easeOutCubic(begin, end),
+    easeInOutCubic: (begin, end) => Animation.samplers.easeInOutCubic(begin, end),
+    easeInQuart: (begin, end) => Animation.samplers.easeInQuart(begin, end),
+    easeOutQuart: (begin, end) => Animation.samplers.easeOutQuart(begin, end),
+    easeInOutQuart: (begin, end) => Animation.samplers.easeInOutQuart(begin, end),
+    easeInQuint: (begin, end) => Animation.samplers.easeInQuint(begin, end),
+    easeOutQuint: (begin, end) => Animation.samplers.easeOutQuint(begin, end),
+    easeInOutQuint: (begin, end) => Animation.samplers.easeInOutQuint(begin, end),
+    easeInSine: (begin, end) => Animation.samplers.easeInSine(begin, end),
+    easeOutSine: (begin, end) => Animation.samplers.easeOutSine(begin, end),
+    easeInOutSine: (begin, end) => Animation.samplers.easeInOutSine(begin, end),
+    easeInExpo: (begin, end) => Animation.samplers.easeInExpo(begin, end),
+    easeOutExpo: (begin, end) => Animation.samplers.easeOutExpo(begin, end),
+    easeInOutExpo: (begin, end) => Animation.samplers.easeInOutExpo(begin, end),
+    easeInCirc: (begin, end) => Animation.samplers.easeInCirc(begin, end),
+    easeOutCirc: (begin, end) => Animation.samplers.easeOutCirc(begin, end),
+    easeInOutCirc: (begin, end) => Animation.samplers.easeInOutCirc(begin, end),
+    easeInBack: (begin, end) => Animation.samplers.easeInBack(begin, end),
+    easeOutBack: (begin, end) => Animation.samplers.easeOutBack(begin, end),
+    easeInOutBack: (begin, end) => Animation.samplers.easeInOutBack(begin, end),
+    easeInElastic: (begin, end) => Animation.samplers.easeInElastic(begin, end),
+    easeOutElastic: (begin, end) => Animation.samplers.easeOutElastic(begin, end),
+    easeInOutElastic: (begin, end) => Animation.samplers.easeInOutElastic(begin, end),
+    easeInBounce: (begin, end) => Animation.samplers.easeInBounce(begin, end),
+    easeOutBounce: (begin, end) => Animation.samplers.easeOutBounce(begin, end),
+    easeInOutBounce: (begin, end) => Animation.samplers.easeInOutBounce(begin, end),
+    punch: (begin, amount) => Animation.samplers.polyline({
         keyframes: [
-            from + (amount / 5) * 4,
-            from - (amount / 5) * 3,
-            from + (amount / 5) * 2,
-            from - (amount / 5) * 1,
-            from
+            begin + (amount / 5) * 4,
+            begin - (amount / 5) * 3,
+            begin + (amount / 5) * 2,
+            begin - (amount / 5) * 1,
+            begin
         ],
         knots: [0, 1, 2, 3, 4]
     }),
 };
 
 const degreeToRadian = Math.PI / 180;
-let privates = instantiatePrivateMap();
+const privates = instantiatePrivateMap();
 
 class PFTween {
-    constructor(from, to, durationMilliseconds) {
-        privates(this).from = typeof from.pinLastValue === 'function' ? from.pinLastValue() : from;
-        privates(this).to = typeof to.pinLastValue === 'function' ? to.pinLastValue() : to;
+    constructor(begin, end, durationMilliseconds) {
         privates(this).duration = durationMilliseconds;
         privates(this).start = [];
         privates(this).complete = [];
         privates(this).update = [];
         privates(this).loop = [];
-
-        this.setEase(samplers.linear);
+        privates(this).sampler = samplers.linear(
+            typeof begin.pinLastValue === 'function' ? begin.pinLastValue() : begin,
+            typeof end.pinLastValue === 'function' ? end.pinLastValue() : end
+        );
     }
 
+    /**
+     * @param  {...any} clips 
+     */
+    static combine(...clips) {
+        return result =>
+            Promise.all(clips.map(i => i())).then(endValues =>
+                Promise.resolve(result != undefined ? result : endValues)
+            );
+    }
+
+    /**
+     * If `isMirror` is not assigned, mirror animation is enabled by default.
+     * @param {boolean=} isMirror 
+     */
     setMirror(isMirror = true) {
         privates(this).isMirror = isMirror;
         return this;
     }
 
-    setLoop(loopCount = Infinity) {
+    /**
+     * If `loopCount` is not assigned, it will be an infinite loop.
+     * @param {number=} loopCount 
+     */
+    setLoops(loopCount = Infinity) {
         privates(this).loopCount = loopCount;
         return this;
     }
 
+    setBegin(number) {
+        privates(this).sampler.begin = typeof number.pinLastValue === 'function' ? number.pinLastValue() : number;
+        return this;
+    }
+
+    setEnd(number) {
+        privates(this).sampler.end = typeof number.pinLastValue === 'function' ? number.pinLastValue() : number;
+        return this;
+    }
+
     /**
-     * @param {{(from: number,to: number):ScalarSampler}} ease 
+     * @param {{(begin: number, end: number):ScalarSampler}} ease 
      */
     setEase(ease) {
-        privates(this).sampler = ease(
-            privates(this).from,
-            privates(this).to
-        );
+        privates(this).sampler = ease(privates(this).sampler.begin, privates(this).sampler.end);
         return this;
     }
 
@@ -103,7 +128,7 @@ class PFTween {
     /**
      * @param {{(iteration: number) : void}} call
      */
-    onLooped(call) {
+    onLoop(call) {
         privates(this).loop.push(call);
         return this;
     }
@@ -119,7 +144,7 @@ class PFTween {
     /**
      * @param {{() : void}} call
      */
-    onCompleted(call) {
+    onComplete(call) {
         privates(this).complete.push(call);
         return this;
     }
@@ -160,13 +185,12 @@ class PFTween {
      * @param {SceneObjectBase} sceneObject 
      */
     onCompleteResetPosition(sceneObject) {
-        const originPositionX = sceneObject.transform.x.pinLastValue();
-        const originPositionY = sceneObject.transform.y.pinLastValue();
-        const originPositionZ = sceneObject.transform.z.pinLastValue();
         privates(this).complete.push(() => {
-            sceneObject.transform.x = originPositionX;
-            sceneObject.transform.y = originPositionY;
-            sceneObject.transform.z = originPositionZ;
+            sceneObject.transform.position = Reactive.pack3(
+                sceneObject.transform.x.pinLastValue(),
+                sceneObject.transform.y.pinLastValue(),
+                sceneObject.transform.z.pinLastValue(),
+            );
         });
         return this;
     }
@@ -175,13 +199,10 @@ class PFTween {
      * @param {SceneObjectBase} sceneObject
      */
     onCompleteResetRotation(sceneObject) {
-        const originRotationX = sceneObject.transform.rotationX.pinLastValue();
-        const originRotationY = sceneObject.transform.rotationY.pinLastValue();
-        const originRotationZ = sceneObject.transform.rotationZ.pinLastValue();
         privates(this).complete.push(() => {
-            sceneObject.transform.rotationX = originRotationX;
-            sceneObject.transform.rotationY = originRotationY;
-            sceneObject.transform.rotationZ = originRotationZ;
+            sceneObject.transform.rotationX = sceneObject.transform.rotationX.pinLastValue();
+            sceneObject.transform.rotationY = sceneObject.transform.rotationY.pinLastValue();
+            sceneObject.transform.rotationZ = sceneObject.transform.rotationZ.pinLastValue();
         });
         return this;
     }
@@ -190,19 +211,23 @@ class PFTween {
      * @param {SceneObjectBase} sceneObject
      */
     onCompleteResetScale(sceneObject) {
-        const originScaleX = sceneObject.transform.scaleX.pinLastValue();
-        const originScaleY = sceneObject.transform.scaleY.pinLastValue();
-        const originScaleZ = sceneObject.transform.scaleZ.pinLastValue();
         privates(this).complete.push(() => {
-            sceneObject.transform.scale = Reactive.scale(originScaleX, originScaleY, originScaleZ);
+            sceneObject.transform.scale = Reactive.scale(
+                sceneObject.transform.scaleX.pinLastValue(),
+                sceneObject.transform.scaleY.pinLastValue(),
+                sceneObject.transform.scaleZ.pinLastValue(),
+            );
         });
         return this;
     }
 
+    /**
+     * Please note that this can only be used on `SceneObject` containing material property.
+     * @param {SceneObjectBase} sceneObject
+     */
     onCompleteResetOpacity(sceneObject) {
-        const originOpacity = sceneObject.material.opacity.pinLastValue();
         privates(this).complete.push(() => {
-            sceneObject.material.opacity = originOpacity;
+            sceneObject.material.opacity = sceneObject.material.opacity.pinLastValue();
         });
         return this;
     }
@@ -211,19 +236,17 @@ class PFTween {
         return animate(privates(this), autoPlay);
     }
 
-    /**@returns {Promise<void>} - get `promise` will start animation immediately*/
-    get promise() {
-        const promise = new Promise((resolve, reject) => {
-            privates(this).complete.push(() => resolve());
+    get clip() {
+        const completePromise = result =>
+            new Promise(resolve => privates(this).complete.push(() =>
+                resolve(result != undefined ? result : privates(this).sampler.end))
+            );
 
-            if (privates(this).loopCount == Infinity) {
-                reject('Set infinite loop will stuck the promise in PFTween.');
-            }
-            
-            animate(privates(this), true);
-        })
+        if (privates(this).loopCount == Infinity) {
+            Diagnostics.log('Please note that set infinite loop will stuck the clips chain.');
+        }
 
-        return promise;
+        return this.apply(false).getPromise(completePromise);
     }
 
     get log() {
@@ -231,23 +254,27 @@ class PFTween {
     }
 
     get scalar() {
-        return animate(privates(this), true).scalar;
+        return this.apply(true).scalar;
     }
 
     get scale() {
-        return animate(privates(this), true).scale;
+        return this.apply(true).scale;
+    }
+
+    get pack2() {
+        return this.apply(true).pack2;
     }
 
     get pack3() {
-        return animate(privates(this), true).pack3;
+        return this.apply(true).pack3;
     }
 
     get pack4() {
-        return animate(privates(this), true).pack4;
+        return this.apply(true).pack4;
     }
 
     get rotation() {
-        return animate(privates(this), true).rotation;
+        return this.apply(true).rotation;
     }
 }
 
@@ -258,6 +285,18 @@ class PFTweener {
         privates(this).driver = driver;
         privates(this).onStart = start;
         privates(this).onUpdate = update;
+    }
+
+    /**
+     * Generally, you should get `clip` directly instead of `apply()` and then call this function. The animation will replay immediately when call this funtion.
+     * @param {{(result:number):Promise<number>}} promise
+     * @returns {{(result:any=undefined):Promise<number>}}
+     */
+    getPromise(promise) {
+        return result => {
+            this.replay();
+            return promise(result);
+        };
     }
 
     replay() {
@@ -307,6 +346,12 @@ class PFTweener {
         return Reactive.scale(scalar, scalar, scalar);
     }
 
+    /**@returns {Point2DSignal} */
+    get pack2() {
+        const scalar = this.scalar
+        return Reactive.pack2(scalar, scalar);
+    }
+
     /**@returns {PointSignal} */
     get pack3() {
         const scalar = this.scalar
@@ -319,7 +364,7 @@ class PFTweener {
         return Reactive.pack4(scalar, scalar, scalar, scalar);
     }
 
-    /**@returns {ScalarSignal} */
+    /**@returns {ScalarSignal} convert degree to radian*/
     get rotation() {
         const scalar = this.scalar
         return scalar.mul(degreeToRadian);
