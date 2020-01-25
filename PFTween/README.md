@@ -57,10 +57,10 @@ plane0.transform.x = new PFTween(plane0.transform.x, 0.1, 1000)
     .setEase(Ease.easeInOutExpo)
     .setDelay(500)
     .onLoop(index => Diagnostics.log(`loop: ${index}`))
-    .onStartVisible(plane0)    // this plane will be visible when animation start
-    .onCompleteHidden(plane0)  // and will be hidden on completed
+    .onStartVisible(plane0)
+    .onCompleteHidden(plane0)
     .onComplete(() => Diagnostics.log('completed!'))
-    .scalar;                   // the value type 'poisition.x' is 'scalar'
+    .scalar;
 ```
 
 You can add your ease type in the script. For example, there is a `punch` ease mode:
@@ -116,10 +116,10 @@ const plane0 = Scene.root.find('plane0');
 
 const ani = new PFTween(-0.1, 0.1, 1000)
     .setEase(Ease.easeOutQuard)
-    .bind(value => Scene.root.find('plane0').transform.x = value) // Bind the tween value
+    .bind(value => Scene.root.find('plane0').transform.x = value)
     .onStartVisible(plane0)
     .onCompleteHidden(plane0)
-    .apply(false); 	// Don't auto start animation when we call the apply()
+    .apply(false);
     
 TouchGestures.onTap().subscribe(() => ani.replay());   
 ```
@@ -147,20 +147,20 @@ const ani_position = new PFTween(0, 0.1, 1000)
     .clip;
 
 const ani_rotation = new PFTween(plane0.transform.rotationZ, 270, 1000)
-		.setEase(Ease.easeOutQuart)
-		.bind(tweener => plane0.transform.rotationZ = tweener.rotation)
-		.clip;
+    .setEase(Ease.easeOutQuart)
+    .bind(tweener => plane0.transform.rotationZ = tweener.rotation)
+    .clip;
 
 const ani_scale = new PFTween(plane0.transform.scaleX, 2.5, 1000)
-		.setEase(Ease.easeOutBack)
-		.bind(tweener => plane0.transform.scale = tweener.scale)
-		.clip;
+    .setEase(Ease.easeOutBack)
+    .bind(tweener => plane0.transform.scale = tweener.scale)
+    .clip;
 
 // Play these animation in sequence
 ani_position()
-  	.then(ani_rotation)
-		.then(ani_scale)
-		.then(() => Diagnostics.log('Finished'))
+    .then(ani_rotation)
+    .then(ani_scale)
+    .then(() => Diagnostics.log('Finished'))
 ```
 
 
@@ -184,24 +184,24 @@ const ani_position = new PFTween(0, 0.1, 1000)
     .clip;
 
 const ani_scale = new PFTween(plane0.transform.scaleX, 2.5, 1000)
-		.setMirror()
+    .setMirror()
     .setLoop(2)
-		.setEase(Ease.easeOutBack)
-		.bind(tweener => plane0.transform.scale = tweener.scale)
-		.clip;
+    .setEase(Ease.easeOutBack)
+    .bind(tweener => plane0.transform.scale = tweener.scale)
+    .clip;
 
 const ani_rotation = new PFTween(plane0.transform.rotationZ, 270, 1000)
-		.setEase(Ease.easeOutQuart)
-		.bind(tweener => plane0.transform.rotationZ = tweener.rotation)
-		.clip;
+    .setEase(Ease.easeOutQuart)
+    .bind(tweener => plane0.transform.rotationZ = tweener.rotation)
+    .clip;
 
 // Use PFTween.combine() to combine multiple clips
 const ani_combined = PFTween.combine(ani_position, ani_scale);
 
 // Play these animation in sequence
 ani_position()
-		.then(ani_scale)
-  	.then(ani_rotation)
-		.then(ani_combined)
-		.then(() => Diagnostics.log('Finished'))
+    .then(ani_scale)
+    .then(ani_rotation)
+    .then(ani_combined)
+    .then(() => Diagnostics.log('Finished'))
 ```
