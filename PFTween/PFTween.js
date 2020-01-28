@@ -73,6 +73,13 @@ class PFTween {
     }
 
     /**
+     * @param {{(tweener: PFTweener) : void}} setter
+     */
+    static To(getter, setter, end, durationMilliseconds) {
+        return new PFTween(getter, end, durationMilliseconds).bind(setter);
+    }
+
+    /**
      * @param  {...any} clips 
      */
     static combine(...clips) {
