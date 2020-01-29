@@ -38,13 +38,13 @@ or make it loop:
 ```javascript
 plane0.transform.scale = new PFTween(0, 1, 1000)
     .setEase(Ease.easeOutBack)
-    .setLoop()
+    .setLoops()
     .setMirror()
     .scale;
 ```
 
 
-You can even `SetDelay`, `SetCallback`, and apply animation to position or anything you want.
+You can even `setDelay()`, set callback by `onLoop()`, `onComplete()`, `onStart()`, and apply tween value to position or anything you want.
 ```javascript
 const Scene = require('Scene'); 
 const Diagnostics = require('Diagnostics'); 
@@ -106,7 +106,7 @@ and some useful callbacks:
 
 ## Reuse the Animation
 
-If you want to reuse the animation. For this purpose, you need use `bind` to set the value and call `apply` in the end of PFTween chain.
+If you want to reuse the animation, you need use `bind()` to set the value and call `apply()` at the end of PFTween chain.
 
 ```javascript
 const Scene = require('Scene'); 
@@ -115,7 +115,7 @@ const TouchGestures = require('TouchGestures');
 const plane0 = Scene.root.find('plane0');
 
 const ani = new PFTween(-0.1, 0.1, 1000)
-    .setEase(Ease.easeOutQuard)
+    .setEase(Ease.easeOutQuad)
     .bind(tweener => Scene.root.find('plane0').transform.x = tweener.scalar)
     .onStartVisible(plane0)
     .onCompleteHidden(plane0)
@@ -142,8 +142,8 @@ const plane0 = Scene.root.find('plane0');
 const ani_position = new PFTween(0, 0.1, 1000)
     .setEase(Ease.easeInOutCirc)
     .setMirror()
-    .setLoop(2)
-    .bind(tweener => plane.transform.x = tweener.scalar)
+    .setLoops(2)
+    .bind(tweener => plane0.transform.x = tweener.scalar)
     .clip;
 
 const ani_rotation = new PFTween(plane0.transform.rotationZ, 270, 1000)
@@ -179,13 +179,13 @@ const plane0 = Scene.root.find('plane0');
 const ani_position = new PFTween(0, 0.1, 1000)
     .setEase(Ease.easeInOutCirc)
     .setMirror()
-    .setLoop(2)
-    .bind(tweener => plane.transform.x = tweener.scalar)
+    .setLoops(2)
+    .bind(tweener => plane0.transform.x = tweener.scalar)
     .clip;
 
 const ani_scale = new PFTween(plane0.transform.scaleX, 2.5, 1000)
     .setMirror()
-    .setLoop(2)
+    .setLoops(2)
     .setEase(Ease.easeOutBack)
     .bind(tweener => plane0.transform.scale = tweener.scale)
     .clip;
@@ -196,12 +196,10 @@ const ani_rotation = new PFTween(plane0.transform.rotationZ, 270, 1000)
     .clip;
 
 // Use PFTween.combine() to combine multiple clips
-const ani_combined = PFTween.combine(ani_position, ani_scale);
+const ani_combined = PFTween.combine(ani_rotation, ani_scale);
 
 // Play these animation in sequence
 ani_position()
-    .then(ani_scale)
-    .then(ani_rotation)
     .then(ani_combined)
     .then(() => Diagnostics.log('Finished'))
 ```
