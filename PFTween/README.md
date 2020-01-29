@@ -116,7 +116,7 @@ const plane0 = Scene.root.find('plane0');
 
 const ani = new PFTween(-0.1, 0.1, 1000)
     .setEase(Ease.easeOutQuad)
-    .bind(tweener => Scene.root.find('plane0').transform.x = tweener.scalar)
+    .bind(tweener => plane0.transform.x = tweener.scalar)
     .onStartVisible(plane0)
     .onCompleteHidden(plane0)
     .apply(false);
@@ -128,7 +128,7 @@ TouchGestures.onTap().subscribe(() => ani.replay());
 
 ## Clips - Async and Promise
 
-In order to use Promise to animate a sequence, you must set the value with `bind`. At the end of PFTween chian, you need to get the `clip` instead of call `apply()`. 
+In order to use Promise to animate a sequence, you must set the value with `bind()`. At the end of PFTween chian, you need to get the `clip` instead of call `apply()`. 
 
 When you get  `clip`, it returns a Promise function. If you want to play the clip, just call `clip()`.
 
