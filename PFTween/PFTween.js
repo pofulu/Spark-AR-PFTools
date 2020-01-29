@@ -347,7 +347,7 @@ class PFTweener {
     }
 
     /**@returns {BoolSignal} */
-    get isRuning() {
+    get isRunning() {
         return privates(this).driver.isRunning();
     }
 
