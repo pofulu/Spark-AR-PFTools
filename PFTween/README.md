@@ -203,3 +203,45 @@ ani_position()
     .then(ani_combined)
     .then(() => Diagnostics.log('Finished'))
 ```
+
+
+
+
+
+## Concatenate Multiple Clips
+
+There is a static funtion for this. You can use `PFTween.concat()` to concatenate multiple clips in to one Promise animation. 
+
+```js
+const Scene = require('Scene'); 
+const Diagnostics = require('Diagnostics');
+
+const plane0 = Scene.root.find('plane0');
+
+// Make animation and save as clip
+const ani_position = new PFTween(0, 0.1, 1000)
+    .setEase(Ease.easeInOutCirc)
+    .setMirror()
+    .setLoops(2)
+    .bind(tweener => plane0.transform.x = tweener.scalar)
+    .clip;
+
+const ani_scale = new PFTween(plane0.transform.scaleX, 2.5, 1000)
+    .setMirror()
+    .setLoops(2)
+    .setEase(Ease.easeOutBack)
+    .bind(tweener => plane0.transform.scale = tweener.scale)
+    .clip;
+
+const ani_rotation = new PFTween(plane0.transform.rotationZ, 270, 1000)
+    .setEase(Ease.easeOutQuart)
+    .bind(tweener => plane0.transform.rotationZ = tweener.rotation)
+    .clip;
+
+// Use PFTween.concat() to combine multiple clips
+const ani_concat = PFTween.concat(ani_position, ani_rotation, ani_scale);
+
+// Play these animation in sequence
+ani_concat()
+    .then(() => Diagnostics.log('Finished'))
+```

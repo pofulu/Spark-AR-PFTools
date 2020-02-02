@@ -90,6 +90,16 @@ class PFTween {
     }
 
     /**
+     * @returns {{(result?:any):Promise<any>}}
+     */
+    static concat(...clips) {
+        return result => {
+            const firstClip = clips.shift();
+            return clips.reduce((pre, cur) => pre.then(cur), firstClip(result));
+        }
+    }
+
+    /**
      * If `isMirror` is not assigned, mirror animation is enabled by default.
      * @param {boolean=} isMirror 
      */
@@ -305,8 +315,8 @@ class PFTweener {
 
     /**
      * Generally, you should get `clip` directly instead of `apply()` and then call this function. The animation will replay immediately when call this funtion.
-     * @param {{(result:number):Promise<number>}} promise
-     * @returns {{(result:any=undefined):Promise<number>}}
+     * @param {{(result?:any):Promise<any>}} promise
+     * @returns {{(result?:any):Promise<any>}}
      */
     getPromise(promise) {
         return result => {
