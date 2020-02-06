@@ -211,13 +211,13 @@ class PFTween {
      * @param {SceneObjectBase} sceneObject 
      */
     onCompleteResetPosition(sceneObject) {
-        privates(this).complete.push(() => {
-            sceneObject.transform.position = Reactive.pack3(
-                sceneObject.transform.x.pinLastValue(),
-                sceneObject.transform.y.pinLastValue(),
-                sceneObject.transform.z.pinLastValue(),
-            );
-        });
+        const original = Reactive.pack3(
+            sceneObject.transform.x.pinLastValue(),
+            sceneObject.transform.y.pinLastValue(),
+            sceneObject.transform.z.pinLastValue(),
+        );
+
+        privates(this).complete.push(() => sceneObject.transform.position = original);
         return this;
     }
 
@@ -225,10 +225,16 @@ class PFTween {
      * @param {SceneObjectBase} sceneObject
      */
     onCompleteResetRotation(sceneObject) {
+        const original = {
+            x: sceneObject.transform.rotationX.pinLastValue(),
+            y: sceneObject.transform.rotationY.pinLastValue(),
+            z: sceneObject.transform.rotationZ.pinLastValue(),
+        };
+
         privates(this).complete.push(() => {
-            sceneObject.transform.rotationX = sceneObject.transform.rotationX.pinLastValue();
-            sceneObject.transform.rotationY = sceneObject.transform.rotationY.pinLastValue();
-            sceneObject.transform.rotationZ = sceneObject.transform.rotationZ.pinLastValue();
+            sceneObject.transform.rotationX = original.x;
+            sceneObject.transform.rotationY = original.y;
+            sceneObject.transform.rotationZ = original.z;
         });
         return this;
     }
@@ -237,13 +243,13 @@ class PFTween {
      * @param {SceneObjectBase} sceneObject
      */
     onCompleteResetScale(sceneObject) {
-        privates(this).complete.push(() => {
-            sceneObject.transform.scale = Reactive.scale(
-                sceneObject.transform.scaleX.pinLastValue(),
-                sceneObject.transform.scaleY.pinLastValue(),
-                sceneObject.transform.scaleZ.pinLastValue(),
-            );
-        });
+        const original = Reactive.scale(
+            sceneObject.transform.scaleX.pinLastValue(),
+            sceneObject.transform.scaleY.pinLastValue(),
+            sceneObject.transform.scaleZ.pinLastValue(),
+        );
+
+        privates(this).complete.push(() => sceneObject.transform.scale = original);
         return this;
     }
 
@@ -252,9 +258,8 @@ class PFTween {
      * @param {SceneObjectBase} sceneObject
      */
     onCompleteResetOpacity(sceneObject) {
-        privates(this).complete.push(() => {
-            sceneObject.material.opacity = sceneObject.material.opacity.pinLastValue();
-        });
+        const original = sceneObject.material.opacity.pinLastValue();
+        privates(this).complete.push(() => sceneObject.material.opacity = original);
         return this;
     }
 
