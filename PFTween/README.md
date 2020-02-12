@@ -60,7 +60,8 @@ plane0.transform.x = new PFTween(plane0.transform.x, 0.1, 1000)
     .onStartVisible(plane0)
     .onCompleteHidden(plane0)
     .onComplete(() => Diagnostics.log('completed!'))
-    .scalar;
+    .scalar;    
+    // Please note that transform.x's value type is "scalar" not "scale" here
 ```
 
 You can add your ease type in the script. For example, there is a `punch` ease mode:
@@ -105,32 +106,39 @@ and some useful callbacks:
 
 
 ## Reuse the Animation
+Everytime you call `new PFTween()` will create a new animation object. In generally, it's not neccesary to create a new animation, you can reuse it for better performance. (However, in generally, user don't notice the performance impact as well)
 
-If you want to reuse the animation, you need use `bind()` to set the value and call `apply()` at the end of PFTween chain.
+E.g., you need to punch a image every time user open their mouth:
+```javascript
+FaceTracking.face(0).mouth.openness.gt(0.2).onOn().subscribe(play_punch_animation);
+
+function play_punch_animation(){
+    plane0.transform.scale = new PFTween(1, 0.3, 1000).setEase(Ease.punch).scale;
+}
+```
+It works, but you don't need to create a new animation every time you play. So we can use `bind()` to set the value and call `apply()` at the end of PFTween chain. It will return a `PFTweener`, a controller for your `PFTween` object. You can call `replay`, `reverse`, `start`, `stop` or get `isRunning` state with `PFTweener`.
 
 ```javascript
-const Scene = require('Scene'); 
-const TouchGestures = require('TouchGestures');
-
-const plane0 = Scene.root.find('plane0');
-
-const ani = new PFTween(-0.1, 0.1, 1000)
-    .setEase(Ease.easeOutQuad)
-    .bind(tweener => plane0.transform.x = tweener.scalar)
-    .onStartVisible(plane0)
-    .onCompleteHidden(plane0)
+const play_punch_animation = new PFTween(1, 0.3, 1000)
+    .setEase(Ease.punch)
+    .bind(tweener => plane0.transform.scale = tweener.scale)
     .apply(false);
     
-TouchGestures.onTap().subscribe(() => ani.replay());   
+FaceTracking.face(0).mouth.openness.gt(0.2).onOn().subscribe(() => play_punch_animation.replay());
 ```
 
-
+Actually, `PFTweener` is a wrapped [`AnimationModule.TimeDriver`](https://sparkar.facebook.com/ar-studio/learn/documentation/reference/classes/animationmodule.timedriver), so you can find the similar APIs from the official document.
 
 ## Clips - Async and Promise
+`clip` is an asynchronous way to reuse animation.
 
-In order to use Promise to animate a sequence, you must set the value with `bind()`. At the end of PFTween chian, you need to get the `clip` instead of call `apply()`. 
+With `clip`, you can play tween animation in sequence.
 
-When you get  `clip`, it returns a Promise function. If you want to play the clip, just call `clip()`.
+E.g, `jump().then(scale).then(rotate).then(fadeout).then(......`
+
+In order to use `clip`, you must set the value with `bind()`, and get `clip` instead of call `apply()` at the end of `PFTween` chain.
+
+When you get `clip`, it returns a Promise. If you want to play the clip, just call `clip()`.
 
 ```js
 const Scene = require('Scene'); 
@@ -206,8 +214,6 @@ ani_position()
 
 
 
-
-
 ## Concatenate Multiple Clips
 
 There is a static funtion for this. You can use `PFTween.concat()` to concatenate multiple clips in to one Promise animation. 
@@ -244,4 +250,23 @@ const ani_concat = PFTween.concat(ani_position, ani_rotation, ani_scale);
 // Play these animation in sequence
 ani_concat()
     .then(() => Diagnostics.log('Finished'))
+```
+
+## Result of `clip()`
+The default result is the end value of first `clip()` animation. Continue from previous code example: If you log the result directly, you will get `0.1`, which is the end value of `ani_position`.
+
+```javascript
+const ani_position = new PFTween(0, 0.1, ...
+
+const ani_concat = PFTween.concat(ani_position ...
+
+ani_concat().then(Diagnostics.log)  //0.1
+```
+
+If you want to set the result for clip chain, just add parameter when calling `clip()`.
+
+```javascript
+ani_concat('Spark AR is awesome').then(Diagnostics.log);        // Spark AR is awesome
+ani_concat([1, 2, 3, 4]).then(Diagnostics.log);                 // [1, 2, 3, 4]
+ani_concat({id: '3052518158091790'}).then(Diagnostics.log);     // {id: '3052518158091790'}
 ```
