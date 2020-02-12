@@ -116,7 +116,9 @@ function play_punch_animation(){
     plane0.transform.scale = new PFTween(1, 0.3, 1000).setEase(Ease.punch).scale;
 }
 ```
-It works, but you don't need to create a new animation every time you play. So we can use `bind()` to set the value and call `apply()` at the end of PFTween chain. It will return a `PFTweener`, a controller for your `PFTween` object. You can call `replay`, `reverse`, `start`, `stop` or get `isRunning` state with `PFTweener`.
+It works, but you don't need to create a new animation every time you play.
+
+Use `bind()` to set the value and call `apply()` at the end of `PFTween` chain. It will return a `PFTweener`, a controller for `PFTween` object. You can call `replay`, `reverse`, `start`, `stop` or get `isRunning` state with `PFTweener`.
 
 ```javascript
 const play_punch_animation = new PFTween(1, 0.3, 1000)
