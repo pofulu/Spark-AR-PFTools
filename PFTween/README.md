@@ -1,7 +1,9 @@
 # PFTween
 PFTween is a wrapped Spark AR animation function. You can handle animation in Spark AR just like [DOTween](http://dotween.demigiant.com) in Unity.
 
-## How to use
+
+
+## Install
 
 0. [Download PFTween](https://github.com/pofulu/Spark-AR-PFTools/raw/master/PFTween/PFTween.js) (Right click and Save as)
 1. Drap/Import to Assets caetgory in Spark AR. (Spark AR support multiple script files after [v75](https://sparkar.facebook.com/ar-studio/learn/documentation/changelog#75))
@@ -16,12 +18,11 @@ import { Ease, PFTween } from './PFTween';
 
    
 
-## Getting Start
+## Usage
 
 Let's say you want to scale a plane:
 ```javascript
 const Scene = require('Scene'); 
-
 const plane0 = Scene.root.find('plane0');
 
 plane0.transform.scale = new PFTween(0, 1, 1000).scale;
@@ -46,11 +47,6 @@ plane0.transform.scale = new PFTween(0, 1, 1000)
 
 You can even `setDelay()`, set callback by `onLoop()`, `onComplete()`, `onStart()`, and apply tween value to position or anything you want.
 ```javascript
-const Scene = require('Scene'); 
-const Diagnostics = require('Diagnostics'); 
-
-const plane0 = Scene.root.find('plane0');
-
 plane0.transform.x = new PFTween(plane0.transform.x, 0.1, 1000)
     .setLoops(2)
     .setMirror()
@@ -66,51 +62,33 @@ plane0.transform.x = new PFTween(plane0.transform.x, 0.1, 1000)
 
 You can add your ease type in the script. For example, there is a `punch` ease mode:
 ```javascript
-const Scene = require('Scene'); 
-const plane0 = Scene.root.find('plane0');
-
 plane0.transform.scale = new PFTween(1, 0.3, 400)
     .setEase(Ease.punch)
-    .scale;
+    .scale;		// auto pack value to Reactive.scale()
 ```
 
 Build-in some useful data type: `rotation`, `scalar`, `scale`, `pack3`......
 ```javascript
-const Scene = require('Scene'); 
-const plane0 = Scene.root.find('plane0');
-
-plane0.transform.rotationX = new PFTween(0, 360, 1000)
+plane0.transform.rotationZ = new PFTween(0, 360, 1000)
     .setMirror()
     .setEase(Ease.easeOutCubic)
-    .rotation;
+    .rotation;	// auto convert degree to radian
 ```
 
 and some useful callbacks: 
 
-`onStartVisible()`
-
-`onStartHidden()`
-
-`onCompleteVisible()`
-
-`onCompleteHidden()`
-
-`onCompleteResetScale()`
-
-`onCompleteResetPosition()`
-
-`onCompleteResetRotation()`
-
-`onCompleteResetOpacity()`
+`onStartVisible()`, `onStartHidden()`, `onCompleteVisible()`, `onCompleteHidden()`, `onCompleteResetScale()`, `onCompleteResetPosition()`, `onCompleteResetRotation()`, `onCompleteResetOpacity()`
 
 
 
 ## Reuse the Animation
+
 Everytime you call `new PFTween()` will create a new animation object. In generally, it's not neccesary to create a new animation, you can reuse it for better performance. (However, in generally, user don't notice the performance impact as well)
 
 E.g., you need to punch a image every time user open their mouth:
 ```javascript
-FaceTracking.face(0).mouth.openness.gt(0.2).onOn().subscribe(play_punch_animation);
+const onMouthOpen = FaceTracking.face(0).mouth.openness.gt(0.2).onOn();
+mouthOpen.subscribe(play_punch_animation);
 
 function play_punch_animation(){
     plane0.transform.scale = new PFTween(1, 0.3, 1000).setEase(Ease.punch).scale;
@@ -121,20 +99,22 @@ It works, but you don't need to create a new animation every time you play.
 Use `bind()` to set the value and call `apply()` at the end of `PFTween` chain. It will return a `PFTweener`, a controller for `PFTween` object. You can call `replay`, `reverse`, `start`, `stop` or get `isRunning` state with `PFTweener`.
 
 ```javascript
+const onMouthOpen = FaceTracking.face(0).mouth.openness.gt(0.2).onOn();
 const play_punch_animation = new PFTween(1, 0.3, 1000)
     .setEase(Ease.punch)
     .bind(tweener => plane0.transform.scale = tweener.scale)
     .apply(false);
     
-FaceTracking.face(0).mouth.openness.gt(0.2).onOn().subscribe(() => play_punch_animation.replay());
+mouthOpen.subscribe(() => play_punch_animation.replay());
 ```
 
-Actually, `PFTweener` is a wrapped [`AnimationModule.TimeDriver`](https://sparkar.facebook.com/ar-studio/learn/documentation/reference/classes/animationmodule.timedriver), so you can find the similar APIs from the official document.
+ `PFTweener` is actually a wrapped [`AnimationModule.TimeDriver`](https://sparkar.facebook.com/ar-studio/learn/documentation/reference/classes/animationmodule.timedriver), so you can find the similar APIs from the official document.
 
-## Clips - Async and Promise
-`clip` is an asynchronous way to reuse animation.
 
-With `clip`, you can play tween animation in sequence.
+
+## Clip - Play Animations in Sequence
+
+`clip` is an asynchronous way to reuse animation based on `Promise`. With `clip`, you can play tween animation in sequence.
 
 E.g, `jump().then(scale).then(rotate).then(fadeout).then(......`
 
@@ -143,132 +123,116 @@ In order to use `clip`, you must set the value with `bind()`, and get `clip` ins
 When you get `clip`, it returns a Promise. If you want to play the clip, just call `clip()`.
 
 ```js
-const Scene = require('Scene'); 
-const Diagnostics = require('Diagnostics');
+const clip1 = new PFTween(0, 1, 500).clip;
+const clip2 = new PFTween(1, 2, 500).clip;
+const clip3 = new PFTween(2, 3, 500).clip;
 
-const plane0 = Scene.root.find('plane0');
-
-// Make animation and save as clip
-const ani_position = new PFTween(0, 0.1, 1000)
-    .setEase(Ease.easeInOutCirc)
-    .setMirror()
-    .setLoops(2)
-    .bind(tweener => plane0.transform.x = tweener.scalar)
-    .clip;
-
-const ani_rotation = new PFTween(plane0.transform.rotationZ, 270, 1000)
-    .setEase(Ease.easeOutQuart)
-    .bind(tweener => plane0.transform.rotationZ = tweener.rotation)
-    .clip;
-
-const ani_scale = new PFTween(plane0.transform.scaleX, 2.5, 1000)
-    .setEase(Ease.easeOutBack)
-    .bind(tweener => plane0.transform.scale = tweener.scale)
-    .clip;
-
-// Play these animation in sequence
-ani_position()
-    .then(ani_rotation)
-    .then(ani_scale)
-    .then(() => Diagnostics.log('Finished'))
+clip1().then(clip2).then(clip3);
 ```
 
 
 
-## Combine Multiple Clips
+### Concatenate Multiple Clips
 
-There is a static funtion for this. You can use `PFTween.combine()` to combine multiple clips in to one Promise animation.
+In addition to manually play multiple clips using `then()`, you can also use `PFTween.concat()` to concatenate them into one `clip`.
 
 ```js
-const Scene = require('Scene'); 
-const Diagnostics = require('Diagnostics');
+const clip1 = new PFTween(0, 1, 500).clip;
+const clip2 = new PFTween(1, 2, 500).clip;
+const clip3 = new PFTween(2, 3, 500).clip;
 
-const plane0 = Scene.root.find('plane0');
+const concat = PFTween.concat([clip1, clip2, clip3]);
+// or
+// const concat = PFTween.concat(clip1, clip2, clip3);
 
-// Make animation and save as clip
-const ani_position = new PFTween(0, 0.1, 1000)
-    .setEase(Ease.easeInOutCirc)
-    .setMirror()
-    .setLoops(2)
-    .bind(tweener => plane0.transform.x = tweener.scalar)
-    .clip;
-
-const ani_scale = new PFTween(plane0.transform.scaleX, 2.5, 1000)
-    .setMirror()
-    .setLoops(2)
-    .setEase(Ease.easeOutBack)
-    .bind(tweener => plane0.transform.scale = tweener.scale)
-    .clip;
-
-const ani_rotation = new PFTween(plane0.transform.rotationZ, 270, 1000)
-    .setEase(Ease.easeOutQuart)
-    .bind(tweener => plane0.transform.rotationZ = tweener.rotation)
-    .clip;
-
-// Use PFTween.combine() to combine multiple clips
-const ani_combined = PFTween.combine(ani_rotation, ani_scale);
-
-// Play these animation in sequence
-ani_position()
-    .then(ani_combined)
-    .then(() => Diagnostics.log('Finished'))
+concat();
 ```
 
 
 
-## Concatenate Multiple Clips
+### Combine Multiple Clips
 
-There is a static funtion for this. You can use `PFTween.concat()` to concatenate multiple clips in to one Promise animation. 
+If you want to start multiple clips at the same time, you can use `PFTween.combine()` to combine multiple clips in to one `clip`.
 
 ```js
-const Scene = require('Scene'); 
-const Diagnostics = require('Diagnostics');
+const clip1 = new PFTween(0, 1, 500).clip;
+const clip2 = new PFTween(1, 2, 500).clip;
+const clip3 = new PFTween(2, 3, 500).clip;
 
-const plane0 = Scene.root.find('plane0');
+const combined_clip = PFTween.combine([clip1, clip2, clip3]);
+// or
+// const combined_clip = PFTween.concat(clip1, clip2, clip3);
 
-// Make animation and save as clip
-const ani_position = new PFTween(0, 0.1, 1000)
-    .setEase(Ease.easeInOutCirc)
-    .setMirror()
-    .setLoops(2)
-    .bind(tweener => plane0.transform.x = tweener.scalar)
-    .clip;
-
-const ani_scale = new PFTween(plane0.transform.scaleX, 2.5, 1000)
-    .setMirror()
-    .setLoops(2)
-    .setEase(Ease.easeOutBack)
-    .bind(tweener => plane0.transform.scale = tweener.scale)
-    .clip;
-
-const ani_rotation = new PFTween(plane0.transform.rotationZ, 270, 1000)
-    .setEase(Ease.easeOutQuart)
-    .bind(tweener => plane0.transform.rotationZ = tweener.rotation)
-    .clip;
-
-// Use PFTween.concat() to combine multiple clips
-const ani_concat = PFTween.concat(ani_position, ani_rotation, ani_scale);
-
-// Play these animation in sequence
-ani_concat()
-    .then(() => Diagnostics.log('Finished'))
+combined_clip();
 ```
 
-## Result of `clip()`
-The default result is the end value of first `clip()` animation. Continue from previous code example: If you log the result directly, you will get `0.1`, which is the end value of `ani_position`.
+ It's the same as `Promise.all()`.
+
+
+
+### Result of Clip
+
+The result of clip is a object with property `value`. The default result value is the end value of first `clip()` animation.
 
 ```javascript
-const ani_position = new PFTween(0, 0.1, ...
+const clip1 = new PFTween(0, 1, 500).clip;
+const clip2 = new PFTween(1, 2, 500).clip;
+const clip3 = new PFTween(2, 3, 500).clip;
 
-const ani_concat = PFTween.concat(ani_position ...
-
-ani_concat().then(Diagnostics.log)  //0.1
+clip1().then(clip2).then(clip3).then(Diagnostics.log);
+// {"value":1}
 ```
 
-If you want to set the result for clip chain, just add parameter when calling `clip()`.
+If you want to set the result for clip chain, just pass a parameter when calling `clip()`.
 
 ```javascript
-ani_concat('Spark AR is awesome').then(Diagnostics.log);        // Spark AR is awesome
-ani_concat([1, 2, 3, 4]).then(Diagnostics.log);                 // [1, 2, 3, 4]
-ani_concat({id: '3052518158091790'}).then(Diagnostics.log);     // {id: '3052518158091790'}
+concat('Spark AR is awesome').then(Diagnostics.log);
+// {"value":"Spark AR is awesome"}
+
+concat([1, 2, 3, 4]).then(Diagnostics.log);
+// {"value":[1, 2, 3, 4]}
+
+concat({ id: '3052518158091790' }).then(Diagnostics.log);
+// {"value":{"id": "3052518158091790"}}
 ```
+
+
+
+### Interrupt Clip
+
+If you want to interrupt `clip()` animation, you have to use `PFTween.newClipCancellation()`, you can pass an optional parameter which will be the result.
+
+```javascript
+const cancellation = PFTween.newClipCancellation('Spark AR is awesome');
+TouchGestures.onTap().subscribe(cancellation.cancel);
+
+const clip1 = new PFTween(0, 1, 1000).clip;
+const clip2 = new PFTween(1, 2, 1000).clip;
+const clip3 = new PFTween(2, 3, 1000).clip;
+
+clip1().then(clip2).then(clip3)
+    .then(Diagnostics.log)	// {"value":"Spark AR is awesome"}
+	.catch(Diagnostics.log)	// {...}
+```
+
+By calling the `cancellation.cancel()`, you can interrupt the clips chain, and you can catch the reason. The reason is an object containing the following properties:
+
+- `message`:  "canceled"
+- `value`: The parameter you passed to the cancellation, which should be the result of clip
+- `lastValue`: The value when you interrupt clips
+- `lastTweener`:  The tweener which be interrupted
+
+Following is a catched error sample of above code:
+
+```json
+{
+    "message": "canceled",
+	"value": "Spark AR is awesome",
+    "lastValue": 1.3,
+    "lastTweener": {}
+}
+```
+
+Please note that `lastTweener` does not display anything in the Spark AR console, but it's acturally the `clip2` in this example.
+
+ 

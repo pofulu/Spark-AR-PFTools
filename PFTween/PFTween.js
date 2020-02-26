@@ -6,7 +6,6 @@
  */
 (function (e) { "use strict"; if (e.WeakMap) { return } var t = Object.prototype.hasOwnProperty; var r = function (e, t, r) { if (Object.defineProperty) { Object.defineProperty(e, t, { configurable: true, writable: true, value: r }) } else { e[t] = r } }; e.WeakMap = function () { function WeakMap() { if (this === void 0) { throw new TypeError("Constructor WeakMap requires 'new'") } r(this, "_id", genId("_WeakMap")); if (arguments.length > 0) { throw new TypeError("WeakMap iterable is not supported") } } r(WeakMap.prototype, "delete", function (e) { checkInstance(this, "delete"); if (!isObject(e)) { return false } var t = e[this._id]; if (t && t[0] === e) { delete e[this._id]; return true } return false }); r(WeakMap.prototype, "get", function (e) { checkInstance(this, "get"); if (!isObject(e)) { return void 0 } var t = e[this._id]; if (t && t[0] === e) { return t[1] } return void 0 }); r(WeakMap.prototype, "has", function (e) { checkInstance(this, "has"); if (!isObject(e)) { return false } var t = e[this._id]; if (t && t[0] === e) { return true } return false }); r(WeakMap.prototype, "set", function (e, t) { checkInstance(this, "set"); if (!isObject(e)) { throw new TypeError("Invalid value used as weak map key") } var n = e[this._id]; if (n && n[0] === e) { n[1] = t; return this } r(e, this._id, [e, t]); return this }); function checkInstance(e, r) { if (!isObject(e) || !t.call(e, "_id")) { throw new TypeError(r + " method called on incompatible receiver " + typeof e) } } function genId(e) { return e + "_" + rand() + "." + rand() } function rand() { return Math.random().toString().substring(2) } r(WeakMap, "_polyfill", true); return WeakMap }(); function isObject(e) { return Object(e) === e } })(typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : typeof global !== "undefined" ? global : this);
 
-
 const Animation = require('Animation');
 const Reactive = require('Reactive');
 const Time = require('Time');
@@ -59,6 +58,9 @@ const samplers = {
 const degreeToRadian = Math.PI / 180;
 const privates = instantiatePrivateMap();
 
+const cancellation_tweener = Symbol('cancellationTweener');
+const cancellation_cancel = Symbol('cancellationFunction');
+
 class PFTween {
     constructor(begin, end, durationMilliseconds) {
         privates(this).duration = durationMilliseconds;
@@ -72,6 +74,16 @@ class PFTween {
         );
     }
 
+    static newClipCancellation(value = undefined) {
+        let result = {};
+        result.value = value;
+        result.cancel = () => result[cancellation_cancel]();
+        result[cancellation_tweener] = {};
+        result[cancellation_cancel] = () => { };
+
+        return result;
+    }
+
     /**
      * @param {{(tweener: PFTweener) : void}} setter
      */
@@ -81,8 +93,10 @@ class PFTween {
 
     /**
      * @param  {...any} clips 
+     * @returns {{(result?:any):Promise<{value:any}>}}
      */
     static combine(...clips) {
+        clips = clips.flat();
         return result =>
             Promise.all(clips.map(i => i())).then(endValues =>
                 Promise.resolve(result != undefined ? result : endValues)
@@ -90,12 +104,12 @@ class PFTween {
     }
 
     /**
-     * @returns {{(result?:any):Promise<any>}}
+     * @returns {{(result?:any):Promise<{value:any}>}}
      */
     static concat(...clips) {
+        clips = clips.flat();
         return result => {
-            const firstClip = clips.shift();
-            return clips.reduce((pre, cur) => pre.then(cur), firstClip(result));
+            return clips.slice(1).reduce((pre, cur) => pre.then(cur), clips[0](result));
         }
     }
 
@@ -186,6 +200,15 @@ class PFTween {
     /**
      * @param {SceneObjectBase} sceneObject
      */
+    onAnimatingVisibleOnly(sceneObject) {
+        this.onStartVisible(sceneObject);
+        this.onCompleteHidden(sceneObject);
+        return this;
+    }
+
+    /**
+     * @param {SceneObjectBase} sceneObject
+     */
     onStartHidden(sceneObject) {
         privates(this).start.push(() => sceneObject.hidden = Reactive.val(true));
         return this;
@@ -267,17 +290,43 @@ class PFTween {
         return animate(privates(this), autoPlay);
     }
 
+    /**
+     * @returns {Promise<{value:any}>}
+     */
     get clip() {
-        const completePromise = result =>
-            new Promise(resolve => privates(this).complete.push(() =>
-                resolve(result != undefined ? result : privates(this).sampler.end))
-            );
+        const completePromise = result => new Promise((resolve, reject) => {
+            if (result) {
+                if (result[cancellation_cancel]) {
+                    result[cancellation_cancel] = () => {
+                        result[cancellation_tweener].stop();
+                        reject({
+                            message: 'canceled',
+                            value: result.value,
+                            lastValue: result[cancellation_tweener].scalar.pinLastValue(),
+                            lastTweener: result[cancellation_tweener]
+                        });
+                    }
+
+                    result.value = result.value ? result.value : privates(this).sampler.end;
+                    privates(this).complete.push(() => resolve(result))
+                } else {
+                    if (result.value) {
+                        privates(this).complete.push(() => resolve(result))
+                    } else {
+                        privates(this).complete.push(() => resolve({ value: privates(this).sampler.end }))
+                    }
+                }
+            } else {
+                privates(this).complete.push(() => resolve({ value: privates(this).sampler.end }))
+            }
+        });
 
         if (privates(this).loopCount == Infinity) {
             Diagnostics.log('Please note that set infinite loop will stuck the clips chain.');
         }
 
-        return this.apply(false).getPromise(completePromise);
+        const tweener = this.apply(false);
+        return privates(tweener).getPromise(completePromise);
     }
 
     get log() {
@@ -316,18 +365,13 @@ class PFTweener {
         privates(this).driver = driver;
         privates(this).onStart = start;
         privates(this).onUpdate = update;
-    }
-
-    /**
-     * Generally, you should get `clip` directly instead of `apply()` and then call this function. The animation will replay immediately when call this funtion.
-     * @param {{(result?:any):Promise<any>}} promise
-     * @returns {{(result?:any):Promise<any>}}
-     */
-    getPromise(promise) {
-        return result => {
+        privates(this).getPromise = promise => result => {
+            if (result && result[cancellation_tweener]) {
+                result[cancellation_tweener] = this;
+            }
             this.replay();
             return promise(result);
-        };
+        }
     }
 
     replay() {
