@@ -1,3 +1,5 @@
+> This tool has been migrated [HERE](https://github.com/pofulu/sparkar-pftween) as an individual package
+
 # PFTween
 PFTween is a wrapped Spark AR animation function. You can handle animation in Spark AR just like [DOTween](http://dotween.demigiant.com) in Unity.
 
