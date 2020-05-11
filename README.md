@@ -8,6 +8,7 @@ Some tools are migrated to be individual packages.
 And others are not be included in this repo.
 - [sparkar-particle](https://github.com/pofulu/sparkar-particle): A wrapped tool for controlling emitters
 - [sparkar-picker-handler](https://github.com/pofulu/sparkar-picker-handler): A wrapper of NativeUI.picker
+- [sparkar-smoother](https://github.com/pofulu/sparkar-smoother): Make object smoothly follow facial features with object's naming.
 
 
 ## `npm` Only
