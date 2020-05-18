@@ -18,3 +18,8 @@ There are some tool are published only in `npm` currently. These tools are not i
 - [sparkar-invoke](https://www.npmjs.com/package/sparkar-invoke): An utility to help handling EventSource
 - [sparkar-animator](https://www.npmjs.com/package/sparkar-animator): A library to control models animation by keyframes
 - [sparkar-sound](https://www.npmjs.com/package/sparkar-sound): Simple tool to control audio with script
+
+## Donations
+If these are useful for you, please consider a donation🙏🏼. One-time donations can be made with PayPal.
+
+[![](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=HW99ESSALJZ36)
