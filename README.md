@@ -10,7 +10,7 @@ And others are not be included in this repo.
 - [sparkar-picker-handler](https://github.com/pofulu/sparkar-picker-handler): A wrapper of NativeUI.picker
 - [sparkar-smoother](https://github.com/pofulu/sparkar-smoother): Make object smoothly follow facial features with object's naming.
 - [sparkar-transfer](https://github.com/pofulu/sparkar-transfer): Send any object's transform value to Patch Editor.
-
+- [sparkar-autofit](https://github.com/pofulu/sparkar-autofit): Keeping the texture of object in correct ratio.
 
 ## `npm` Only
 There are some tool are published only in `npm` currently. These tools are not included any sample project, but could be useful in develope. Please note that these could be more buggly then above tools, some of them even don't have a proper README😅
