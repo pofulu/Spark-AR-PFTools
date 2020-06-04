@@ -20,6 +20,7 @@ There are some tool are published only in `npm` currently. These tools are not i
 - [sparkar-sound](https://www.npmjs.com/package/sparkar-sound): Simple tool to control audio with script
 - [sparkar-device](https://www.npmjs.com/package/sparkar-device): A tool to accessing to display information
 - [sparkar-screen](https://www.npmjs.com/package/sparkar-screen): A tool to accessing to device state
+- [sparkar-remap](https://www.npmjs.com/package/sparkar-remap): An Utility for mapping value
 
 ## Donations
 If these are useful for you, please consider a donation🙏🏼. One-time donations can be made with PayPal.
