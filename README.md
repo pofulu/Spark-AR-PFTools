@@ -1,5 +1,5 @@
 # Spark-AR-PFTools
-Some utilities for Spark AR. Most of them are **Script Only** tools currently.
+Some utilities and library for Spark AR. Most of them are **Script Only** tools currently.
 
 ## Repository with Demo Projects
 Some tools are migrated to be individual packages.
