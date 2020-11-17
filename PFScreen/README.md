@@ -1,3 +1,5 @@
+> This tool has been migrated [HERE](https://github.com/pofulu/sparkar-screen) as an individual package.
+
 # PFScreen
 PFScreen is a tool to set position of scene object with percentage of screen coord. You can use this tool to set the position of an object to ensure that all objects can be placed in the correct position on different devices.
 
