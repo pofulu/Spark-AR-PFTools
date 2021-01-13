@@ -12,6 +12,7 @@ And others are not be included in this repo.
 - [sparkar-smoother](https://github.com/pofulu/sparkar-smoother): Make object smoothly follow facial features with object's naming.
 - [sparkar-transfer](https://github.com/pofulu/sparkar-transfer): Send any object's transform value to Patch Editor.
 - [sparkar-autofit](https://github.com/pofulu/sparkar-autofit): Keeping the texture of object in correct ratio.
+- [sparkar-cloner](https://github.com/pofulu/sparkar-cloner): Dynamically instantiating blocks and controlling them without coding.
 
 ## `npm` Only
 There are some tool are published only in `npm` currently. These tools are not included any sample project, but could be useful in develope. Please note that these could be more buggly then above tools, some of them even don't have a proper README😅
@@ -20,7 +21,6 @@ There are some tool are published only in `npm` currently. These tools are not i
 - [sparkar-animator](https://www.npmjs.com/package/sparkar-animator): A library to control models animation by keyframes
 - [sparkar-sound](https://www.npmjs.com/package/sparkar-sound): Simple tool to control audio with script
 - [sparkar-device](https://www.npmjs.com/package/sparkar-device): A tool to accessing to display information
-- [sparkar-screen](https://www.npmjs.com/package/sparkar-screen): A tool to accessing to device state
 - [sparkar-remap](https://www.npmjs.com/package/sparkar-remap): An Utility for mapping value
 
 ## Donations
