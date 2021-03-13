@@ -13,6 +13,7 @@ And others are not be included in this repo.
 - [sparkar-transfer](https://github.com/pofulu/sparkar-transfer): Send any object's transform value to Patch Editor.
 - [sparkar-autofit](https://github.com/pofulu/sparkar-autofit): Keeping the texture of object in correct ratio.
 - [sparkar-cloner](https://github.com/pofulu/sparkar-cloner): Dynamically instantiating blocks and controlling them without coding.
+- [sparkar-bezier-easing](https://github.com/pofulu/sparkar-bezier-easing): cubic-bezier implementation for Spark AR animation easings.
 
 ## `npm` Only
 There are some tool are published only in `npm` currently. These tools are not included any sample project, but could be useful in develope. Please note that these could be more buggly then above tools, some of them even don't have a proper README😅
