@@ -15,7 +15,6 @@ And others are not be included in this repo.
 - [sparkar-cloner](https://github.com/pofulu/sparkar-cloner): Dynamically instantiating blocks and controlling them without coding.
 - [sparkar-bezier-easing](https://github.com/pofulu/sparkar-bezier-easing): cubic-bezier implementation for Spark AR animation easings.
 - [sparkar-logger](https://github.com/pofulu/sparkar-logger): Simple runtime console logger for Spark AR
-- [sparkar-bundler](https://github.com/pofulu/sparkar-bundler): TypeScript bundler for transpiling package to Meta Spark Studio
 
 ## `npm` Only
 There are some tool are published only in `npm` currently. These tools are not included any sample project, but could be useful in develope. Please note that these could be more buggly then above tools, some of them even don't have a proper README😅
@@ -25,6 +24,7 @@ There are some tool are published only in `npm` currently. These tools are not i
 - [sparkar-sound](https://www.npmjs.com/package/sparkar-sound): Simple tool to control audio with script
 - [sparkar-device](https://www.npmjs.com/package/sparkar-device): A tool to accessing to display information
 - [sparkar-remap](https://www.npmjs.com/package/sparkar-remap): An Utility for mapping value
+- [sparkar-bundler](https://github.com/pofulu/sparkar-bundler): TypeScript bundler for transpiling package to Meta Spark Studio
 
 ## Donations
 If these are useful for you, please consider a donation🙏🏼. One-time donations can be made with PayPal.
